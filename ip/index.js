@@ -1,5 +1,5 @@
 //axios import buraya gelecek
-
+import axios from 'axios';
 var benimIP;
 
 
@@ -31,6 +31,19 @@ async function ipAdresimiAl(){
 	ADIM 5'e gelene kadar fonksiyonunuzu test etmek için ip nizi URL'ye manuel olarak ekleyebilirsiniz.
 */
 
+const getData = async function() {
+	await ipAdresimiAl();
+	axios.get("https://apis.ergineer.com/ipgeoapi/" + benimIP)
+	.then(function(response) {
+		return response.data;
+	})
+	.then(function(ipDatasi) {
+		document.querySelector("div.cards").appendChild(createCard(ipDatasi));
+	})
+}
+
+getData();
+
 /*
 	ADIM 2: Geri döndürülen verileri inceleyin, bu sizin ip bilgileriniz! Bileşen fonksiyonunuzu geliştirmek içindeki bu veri yapısını
 	iyice anlamanız gerekmektedir.
@@ -40,6 +53,26 @@ async function ipAdresimiAl(){
 	ADIM 3: Argümanı sadece 1 nesne kabül eden bir fonksiyon oluşturun.
     DOM metotlarını ve özelliklerini kullanarak, şunları gerçekleştirin:
 	
+	{
+    "sorgu": "176.234.89.56",
+    "durum": "OK",
+    "kıta": "Asia",
+    "ülke": "Turkey",
+    "ülkeKodu": "TR",
+    "ülkebayrağı": "https://apis.ergineer.com/ulkebayraklari/TR",
+    "bölge": "34",
+    "bölgeAdı": "Istanbul",
+    "şehir": "Istanbul",
+    "zip": "34010",
+    "enlem": 41.0247,
+    "boylam": 28.9252,
+    "saatdilimi": "Europe/Istanbul",
+    "parabirimi": "TRY",
+    "isp": "SUPERONLINE-Broadband",
+    "organizasyon": "Superonline Iletisim Hizmetleri",
+    "as": "AS34984 Superonline Iletisim Hizmetleri A.S."
+    }
+
 	<div class="card">
 	<img src={ülke bayrağı url} />
 	<div class="card-info">
@@ -53,6 +86,53 @@ async function ipAdresimiAl(){
 	</div>
     </div>
 */
+
+function createCard(veri) {
+
+	const cardDiv = document.createElement("div");
+	cardDiv.classList.add("card");
+
+	const cardImg = document.createElement("img");
+	cardImg.src = veri["ülkebayrağı"];
+	cardDiv.appendChild(cardImg);
+
+	const cardInfo = document.createElement("div");
+	cardInfo.classList.add("card-info");
+	cardDiv.appendChild(cardInfo);
+
+	const cardHeader = document.createElement("h3");
+	cardHeader.classList.add("ip");
+	cardHeader.textContent = veri["sorgu"];
+	cardInfo.appendChild(cardHeader);
+
+	const cardUlke = document.createElement("p");
+	cardUlke.classList.add("ulke");
+	cardUlke.textContent = `(${veri["ülke"]} ${veri["ülkeKodu"]})`;
+	cardInfo.appendChild(cardUlke);
+
+	const cardEnlem = document.createElement("p");
+	cardEnlem.textContent = `Enlem: ${veri["enlem"]} Boylam: ${veri["boylam"]}`;
+	cardInfo.appendChild(cardEnlem);
+
+	const cardSehir = document.createElement("p");
+	cardSehir.textContent = veri["şehir"];
+	cardInfo.appendChild(cardSehir);
+
+	const cardSaat = document.createElement("p");
+	cardSaat.textContent = `Saat dilimi: ${veri["saatdilimi"]}`;
+	cardInfo.appendChild(cardSaat);
+
+	const cardPara = document.createElement("p");
+	cardPara.textContent = `Para birimi: ${veri["parabirimi"]}`;
+	cardInfo.appendChild(cardPara);
+
+	const cardISP = document.createElement("p");
+	cardISP.textContent = `ISP: ${veri["isp"]}`;
+	cardInfo.appendChild(cardISP);
+
+	return cardDiv;
+}
+
 
 /*
 	ADIM 4: API'den alınan verileri kullanarak ADIM 3'te verilen yapıda bir kart oluşturun ve 
